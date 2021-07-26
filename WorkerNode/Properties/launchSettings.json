@@ -1,0 +1,12 @@
+﻿{
+  "profiles": {
+    "WorkerNode": {
+      "commandName": "Project",
+      "dotnetRunMessages": "true",
+      "commandLineArgs": "--port 19797 --servers http://127.0.0.1:19796/",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
