@@ -33,7 +33,7 @@ namespace WorkerNode
 
             if (_options.Value.Count.HasValue)
             {
-                var count = _options.Value.Count.Value;
+                int count = _options.Value.Count.Value;
 
                 await Task.Delay(200, stoppingToken);
 
@@ -43,10 +43,14 @@ namespace WorkerNode
 
                 for (var i = 0; i < count / 40; i++)
                 {
-                    Response<ClaimSubmitted>[] responses = await Task.WhenAll(Enumerable.Range(0, 10).Select(_ =>
+                    const int total = 10;
+
+                    Response<ClaimSubmitted>[] responses = await Task.WhenAll(Enumerable.Range(0, total).Select(index =>
                         client.GetResponse<ClaimSubmitted>(new SubmitClaim
                         {
                             ClaimId = NewId.NextGuid(),
+                            Index = index + 1,
+                            Count = total
                         }, stoppingToken))).ConfigureAwait(false);
                 }
 
@@ -58,16 +62,38 @@ namespace WorkerNode
             }
             else if (!string.IsNullOrWhiteSpace(_options.Value.Servers))
             {
-                for (var i = 0; i < 10; i++)
+                const int total = 10;
+
+                for (var i = 0; i < total; i++)
                 {
                     await Task.Delay(200, stoppingToken);
 
                     Response<ClaimSubmitted> response = await client.GetResponse<ClaimSubmitted>(new SubmitClaim
                     {
                         ClaimId = NewId.NextGuid(),
+                        Index = i + 1,
+                        Count = total
                     }, stoppingToken);
 
-                    _logger.LogInformation("Claim Submitted: {ClaimId} - {SourceAddress}", response.Message.ClaimId, response.SourceAddress);
+                    _logger.LogInformation("Claim Submitted: {Index}/{Count} {ClaimId} - {SourceAddress}", i + 1, total,
+                        response.Message.ClaimId, response.SourceAddress);
+                }
+
+                await Task.Delay(10000, stoppingToken);
+
+                for (var i = 0; i < total; i++)
+                {
+                    await Task.Delay(200, stoppingToken);
+
+                    Response<ClaimSubmitted> response = await client.GetResponse<ClaimSubmitted>(new SubmitClaim
+                    {
+                        ClaimId = NewId.NextGuid(),
+                        Index = i + 1,
+                        Count = total
+                    }, stoppingToken);
+
+                    _logger.LogInformation("Claim Submitted: {Index}/{Count} {ClaimId} - {SourceAddress}", i + 1, total,
+                        response.Message.ClaimId, response.SourceAddress);
                 }
             }
         }

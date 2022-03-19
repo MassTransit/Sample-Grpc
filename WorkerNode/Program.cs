@@ -3,7 +3,6 @@ namespace WorkerNode
     using System;
     using System.Threading.Tasks;
     using MassTransit;
-    using MassTransit.MultiBus;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
@@ -23,10 +22,7 @@ namespace WorkerNode
             return Host.CreateDefaultBuilder(args)
                 .UseSerilog((host, log) =>
                 {
-                    if (host.HostingEnvironment.IsProduction())
-                        log.MinimumLevel.Information();
-                    else
-                        log.MinimumLevel.Debug();
+                    log.MinimumLevel.Information();
 
                     log.WriteTo.Console();
                 })
@@ -74,7 +70,6 @@ namespace WorkerNode
                         });
                     });
 
-                    services.AddMassTransitHostedService(true);
                     services.AddHostedService<ClaimSubmissionService>();
 
                     services.AddOptions<StartupOptions>()

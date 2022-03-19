@@ -3,7 +3,6 @@ namespace WorkerNode
     using System.Threading.Tasks;
     using Contracts;
     using MassTransit;
-    using MassTransit.Context;
 
 
     public class SubmitClaimConsumer :
@@ -11,9 +10,10 @@ namespace WorkerNode
     {
         public Task Consume(ConsumeContext<SubmitClaim> context)
         {
-            LogContext.Info?.Log("Submit Claim: {ClaimId} {SourceAddress}", context.Message.ClaimId, context.SourceAddress);
+            LogContext.Info?.Log("Submit Claim: {Index}/{Count} {ClaimId} {SourceAddress}", context.Message.Index, context.Message.Count,
+                context.Message.ClaimId, context.SourceAddress);
 
-            return context.RespondAsync(new ClaimSubmitted {ClaimId = context.Message.ClaimId});
+            return context.RespondAsync(new ClaimSubmitted { ClaimId = context.Message.ClaimId });
         }
     }
 }
